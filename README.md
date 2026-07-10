@@ -37,6 +37,8 @@ open http://localhost
 
 **默认管理员账号：** `admin / 123456`
 
+前端构建产物会输出到 `research-hub/dist/`，Nginx 直接挂载这个目录。
+
 ## 项目结构
 
 ```

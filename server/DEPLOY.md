@@ -87,7 +87,9 @@ curl http://localhost:8080/api/auth/login \
 
 ## 前端配置
 
-前端 `research-hub` 项目需要配置 API 地址。在 `research-hub` 目录创建 `.env` 文件：
+如果前后端通过同一个 Nginx 对外提供服务，前端不需要单独配置 API 地址，默认直接走相对路径 `/api` 即可。
+
+如果你要单独启动前端开发服务器，再在 `research-hub` 目录创建 `.env` 文件：
 
 ```
 VITE_API_BASE_URL=http://localhost:8080/api

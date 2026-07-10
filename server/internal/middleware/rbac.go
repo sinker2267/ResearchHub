@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"researchhub-server/internal/database"
 	"researchhub-server/internal/model"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,8 +36,21 @@ func hasPermission(user model.User, code string) bool {
 }
 
 func CORSMiddleware(origins string) gin.HandlerFunc {
+	allowedOrigins := map[string]struct{}{}
+	for _, origin := range strings.Split(origins, ",") {
+		origin = strings.TrimSpace(origin)
+		if origin != "" {
+			allowedOrigins[origin] = struct{}{}
+		}
+	}
+
 	return func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", origins)
+		if origin := c.GetHeader("Origin"); origin != "" {
+			if _, ok := allowedOrigins[origin]; ok {
+				c.Header("Access-Control-Allow-Origin", origin)
+				c.Header("Vary", "Origin")
+			}
+		}
 		c.Header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Origin,Content-Type,Authorization")
 		c.Header("Access-Control-Allow-Credentials", "true")
@@ -61,7 +76,7 @@ func LoggerMiddleware() gin.HandlerFunc {
 		u := user.(model.User)
 		database.DB.Create(&model.OperationLog{
 			UserID: u.ID, Username: u.Username,
-			Action: methodToAction(method),
+			Action:   methodToAction(method),
 			Resource: c.FullPath(), Detail: c.Request.URL.Path, IP: c.ClientIP(),
 		})
 	}
@@ -69,9 +84,13 @@ func LoggerMiddleware() gin.HandlerFunc {
 
 func methodToAction(method string) string {
 	switch method {
-	case "POST": return "创建"
-	case "PUT": return "更新"
-	case "DELETE": return "删除"
-	default: return "访问"
+	case "POST":
+		return "创建"
+	case "PUT":
+		return "更新"
+	case "DELETE":
+		return "删除"
+	default:
+		return "访问"
 	}
 }
