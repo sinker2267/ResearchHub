@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { UserInfo, LoginRequest } from '@/types'
-import { mockLogin, mockLogout } from '@/mock'
+import { authApi } from '@/api'
 import { STORAGE_KEYS } from '@/constants'
 
 export const useUserStore = defineStore('user', () => {
@@ -27,7 +27,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function login(data: LoginRequest): Promise<string | null> {
-    const res = await mockLogin(data)
+    const res = await authApi.login(data)
     if (res.code !== 0) return res.message
     const { accessToken, refreshToken: rt, userInfo: info } = res.data
     token.value = accessToken
@@ -40,7 +40,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function logout(): Promise<void> {
-    await mockLogout()
+    await authApi.logout()
     token.value = null
     refreshToken.value = null
     userInfo.value = null
