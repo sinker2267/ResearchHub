@@ -1,0 +1,1 @@
+import{Kt as e,R as t,b as n,d as r,m as i,t as a}from"./_plugin-vue_export-helper-C4X13pXe.js";var o={class:`page-loading`},s={class:`loading-text`},c=a(n({__name:`PageLoading`,props:{text:{}},setup(n){return(a,c)=>(t(),i(`div`,o,[c[0]||=r(`div`,{class:`loading-spinner`},null,-1),r(`p`,s,e(n.text||`加载中...`),1)]))}}),[[`__scopeId`,`data-v-a99e4af0`]]);export{c as t};

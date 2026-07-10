@@ -50,6 +50,11 @@ async function handleFavorite(): Promise<void> {
   await blogStore.toggleFavorite(blogStore.currentPost.id)
 }
 
+function handleEdit(): void {
+  if (!blogStore.currentPost) return
+  router.push(`/blog/${blogStore.currentPost.id}/edit`)
+}
+
 async function handleAddComment(): Promise<void> {
   if (!commentText.value.trim() || !blogStore.currentPost) return
   submitting.value = true
@@ -62,8 +67,6 @@ async function handleAddComment(): Promise<void> {
     submitting.value = false
   }
 }
-
-async function handlePin(): Promise<void> { if (blogStore.currentPost) { blogStore.currentPost.isPinned = !blogStore.currentPost.isPinned; blogStore.currentPost.pinnedAt = blogStore.currentPost.isPinned ? new Date().toISOString() : null } }
 
 onMounted(() => { load() })
 </script>

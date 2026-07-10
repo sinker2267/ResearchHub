@@ -48,7 +48,7 @@ function openEdit(user: UserListItem): void {
   editId.value = user.id
   form.username = user.username; form.password = ''
   form.displayName = user.displayName; form.email = user.email
-  form.department = user.department; form.title = user.title
+  form.department = user.department; form.title = user.title || ''
   dialogVisible.value = true
 }
 

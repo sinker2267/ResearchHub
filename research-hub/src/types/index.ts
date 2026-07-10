@@ -60,6 +60,7 @@ export interface BlogPost {
   summary: string
   content: string
   coverImage: string
+  categoryID?: number
   tags: Tag[]
   category: Category
   author: UserInfo
@@ -67,8 +68,6 @@ export interface BlogPost {
   viewCount: number
   likeCount: number
   commentCount: number
-  isPinned?: boolean
-  pinnedAt?: string | null
   isPinned?: boolean
   pinnedAt?: string | null
   isLiked: boolean
@@ -119,8 +118,6 @@ export interface Resource {
   isPinned?: boolean
   pinnedAt?: string | null
   isLiked: boolean
-  isPinned?: boolean
-  pinnedAt?: string | null
   isFavorited: boolean
   status: ResourceStatus
   createdAt: string
@@ -210,6 +207,7 @@ export interface UserListItem {
   displayName: string
   email: string
   department: string
+  title?: string
   roles: Role[]
   status: 'active' | 'disabled'
   lastLoginAt: string
