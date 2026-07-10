@@ -2,10 +2,12 @@ package middleware
 
 import (
 	"net/http"
-	"strings"
 	"researchhub-server/internal/config"
-	"researchhub-server/internal/model"
 	"researchhub-server/internal/database"
+	"researchhub-server/internal/model"
+	"strings"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -21,9 +23,10 @@ func GenerateToken(userID uint, username string, cfg *config.Config) (string, er
 		UserID:   userID,
 		Username: username,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(jwt.TimeFunc().Add(24 * 3600 * 1e9)), // 24h
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 		},
 	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(cfg.JWTSecret))
 }
