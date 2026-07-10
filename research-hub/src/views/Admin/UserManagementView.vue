@@ -18,6 +18,7 @@ const form = reactive({
   email: '',
   department: '',
   title: '',
+  roleIds: [] as number[],
 })
 
 const allRoles = ref<Role[]>([])
@@ -41,7 +42,6 @@ function openCreate(): void {
   isEdit.value = false
   editId.value = null
   form.username = ''; form.password = ''; form.displayName = ''
-  form.roleIds = [] as number[]
   form.email = ''; form.department = ''; form.title = ''
   dialogVisible.value = true
 }

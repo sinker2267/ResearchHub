@@ -1,5 +1,5 @@
 import http from '@/api/request'
-import type { ApiResponse, UserListItem, Role, Permission, Tag, OperationLog, SystemSetting, PageResponse } from '@/types'
+import type { ApiResponse, UserListItem, Role, Permission, Tag, Category, OperationLog, SystemSetting, PageResponse } from '@/types'
 
 export const adminApi = {
   // Users
