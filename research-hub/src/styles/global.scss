@@ -1,0 +1,218 @@
+// ============================================================
+// ResearchHub Global Styles & Utilities
+// ============================================================
+@use 'tokens' as *;
+@use 'reset' as *;
+
+// --- Scrollbar ---
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: $gray-300;
+  border-radius: $radius-full;
+  &:hover {
+    background: $gray-400;
+  }
+}
+
+// --- Selection ---
+::selection {
+  background: $brand-200;
+  color: $text-primary;
+}
+
+// --- Focus ring ---
+:focus-visible {
+  outline: 2px solid $brand-500;
+  outline-offset: 2px;
+}
+
+// --- Utility: text truncate ---
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// --- Utility: visually hidden (screen-reader only) ---
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// --- Page container ---
+.page-container {
+  max-width: $content-max-width;
+  margin: 0 auto;
+  padding: $space-6 $space-6;
+}
+
+.page-container--narrow {
+  max-width: $content-narrow;
+  margin: 0 auto;
+  padding: $space-6 $space-6;
+}
+
+// --- Card base ---
+.card {
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+}
+
+.card--hoverable {
+  @extend .card;
+  transition: box-shadow $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-card-hover;
+  }
+}
+
+.card-body {
+  padding: $space-5;
+}
+
+// --- Flex helpers ---
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// --- Gap helpers ---
+.gap-1 { gap: $space-1; }
+.gap-2 { gap: $space-2; }
+.gap-3 { gap: $space-3; }
+.gap-4 { gap: $space-4; }
+.gap-6 { gap: $space-6; }
+.gap-8 { gap: $space-8; }
+
+// --- Spacing helpers ---
+.mt-0 { margin-top: 0; }
+.mt-2 { margin-top: $space-2; }
+.mt-4 { margin-top: $space-4; }
+.mt-6 { margin-top: $space-6; }
+.mt-8 { margin-top: $space-8; }
+.mb-2 { margin-bottom: $space-2; }
+.mb-4 { margin-bottom: $space-4; }
+.mb-6 { margin-bottom: $space-6; }
+.mb-8 { margin-bottom: $space-8; }
+
+// --- Skeleton animation ---
+@keyframes skeleton-loading {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, $gray-100 25%, $gray-50 50%, $gray-100 75%);
+  background-size: 200px 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: $radius-sm;
+}
+
+// --- Fade transition ---
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity $transition-base;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+// --- Markdown body styles ---
+.markdown-body {
+  line-height: $line-height-relaxed;
+  color: $text-primary;
+
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: $space-6;
+    margin-bottom: $space-3;
+    font-weight: $font-weight-semibold;
+  }
+  h1 { font-size: $font-size-4xl; }
+  h2 { font-size: $font-size-3xl; padding-bottom: $space-2; border-bottom: 1px solid $border-color; }
+  h3 { font-size: $font-size-2xl; }
+  h4 { font-size: $font-size-xl; }
+
+  p {
+    margin-bottom: $space-4;
+  }
+
+  ul, ol {
+    padding-left: $space-8;
+    margin-bottom: $space-4;
+    list-style: initial;
+  }
+  ol { list-style: decimal; }
+
+  li { margin-bottom: $space-1; }
+
+  pre {
+    background: $gray-950;
+    color: $gray-100;
+    padding: $space-4;
+    border-radius: $radius-md;
+    overflow-x: auto;
+    margin-bottom: $space-4;
+    font-size: $font-size-sm;
+  }
+
+  code {
+    background: $gray-100;
+    padding: 2px 6px;
+    border-radius: $radius-sm;
+    font-size: 0.9em;
+  }
+
+  pre code {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+  }
+
+  blockquote {
+    border-left: 3px solid $brand-300;
+    padding-left: $space-4;
+    margin-bottom: $space-4;
+    color: $text-secondary;
+  }
+
+  table {
+    margin-bottom: $space-4;
+    th, td {
+      padding: $space-2 $space-4;
+      border: 1px solid $border-color;
+    }
+    th {
+      background: $gray-50;
+      font-weight: $font-weight-semibold;
+    }
+  }
+
+  img {
+    border-radius: $radius-md;
+    max-width: 100%;
+  }
+}
