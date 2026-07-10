@@ -5,7 +5,7 @@ import { fileURLToPath, URL } from 'node:url'
 export default defineConfig({
   plugins: [vue()],
   build: {
-    outDir: 'dist-build',
+    outDir: 'dist',
   },
   resolve: {
     alias: {
