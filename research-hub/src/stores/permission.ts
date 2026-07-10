@@ -24,6 +24,8 @@ export const usePermissionStore = defineStore('permission', () => {
         { id: 'admin-permissions', label: '权限管理', icon: 'Lock', path: '/admin/permissions', permission: PERMISSIONS.PERMISSION_MANAGE },
         { id: 'admin-resources', label: '资源管理', icon: 'Files', path: '/admin/resources', permission: PERMISSIONS.RESOURCE_MANAGE },
         { id: 'admin-logs', label: '操作日志', icon: 'DocumentChecked', path: '/admin/logs', permission: PERMISSIONS.LOG_VIEW },
+        { id: 'admin-tags', label: '标签管理', icon: 'CollectionTag', path: '/admin/tags', permission: PERMISSIONS.SETTING_MANAGE },
+        { id: 'admin-categories', label: '分类管理', icon: 'Grid', path: '/admin/categories', permission: PERMISSIONS.SETTING_MANAGE },
         { id: 'admin-settings', label: '系统设置', icon: 'Tools', path: '/admin/settings', permission: PERMISSIONS.SETTING_MANAGE },
       ],
     },

@@ -171,3 +171,67 @@ func (h *AdminHandler) UpdateSettings(c *gin.Context) {
 	}
 	Success(c, nil)
 }
+
+// Tag management
+func (h *AdminHandler) GetTags(c *gin.Context) {
+	var tags []model.Tag
+	database.DB.Find(&tags)
+	Success(c, tags)
+}
+
+func (h *AdminHandler) CreateTag(c *gin.Context) {
+	var tag model.Tag
+	if err := c.ShouldBindJSON(&tag); err != nil { Error(c, 400, "请求参数错误"); return }
+	database.DB.Create(&tag)
+	Success(c, tag)
+}
+
+func (h *AdminHandler) UpdateTag(c *gin.Context) {
+	id, _ := ParseID(c, "id")
+	var tag model.Tag
+	if err := database.DB.First(&tag, id).Error; err != nil { Error(c, 404, "标签不存在"); return }
+	var input model.Tag
+	c.ShouldBindJSON(&input)
+	database.DB.Model(&tag).Updates(map[string]interface{}{
+		"name": input.Name, "slug": input.Slug, "color": input.Color,
+	})
+	Success(c, tag)
+}
+
+func (h *AdminHandler) DeleteTag(c *gin.Context) {
+	id, _ := ParseID(c, "id")
+	database.DB.Delete(&model.Tag{}, id)
+	Success(c, nil)
+}
+
+// Category management
+func (h *AdminHandler) GetCategories(c *gin.Context) {
+	var cats []model.Category
+	database.DB.Find(&cats)
+	Success(c, cats)
+}
+
+func (h *AdminHandler) CreateCategory(c *gin.Context) {
+	var cat model.Category
+	if err := c.ShouldBindJSON(&cat); err != nil { Error(c, 400, "请求参数错误"); return }
+	database.DB.Create(&cat)
+	Success(c, cat)
+}
+
+func (h *AdminHandler) UpdateCategory(c *gin.Context) {
+	id, _ := ParseID(c, "id")
+	var cat model.Category
+	if err := database.DB.First(&cat, id).Error; err != nil { Error(c, 404, "分类不存在"); return }
+	var input model.Category
+	c.ShouldBindJSON(&input)
+	database.DB.Model(&cat).Updates(map[string]interface{}{
+		"name": input.Name, "slug": input.Slug, "description": input.Description,
+	})
+	Success(c, cat)
+}
+
+func (h *AdminHandler) DeleteCategory(c *gin.Context) {
+	id, _ := ParseID(c, "id")
+	database.DB.Delete(&model.Category{}, id)
+	Success(c, nil)
+}

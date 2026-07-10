@@ -1,5 +1,5 @@
 import http from '@/api/request'
-import type { ApiResponse, UserListItem, Role, Permission, OperationLog, SystemSetting, PageResponse } from '@/types'
+import type { ApiResponse, UserListItem, Role, Permission, Tag, OperationLog, SystemSetting, PageResponse } from '@/types'
 
 export const adminApi = {
   // Users
@@ -46,5 +46,34 @@ export const adminApi = {
   // Dashboard stats
   getDashboardStats(): Promise<ApiResponse<Record<string, number>>> {
     return http.get('/admin/dashboard').then((r) => r.data)
+  },
+
+  // Categories
+  getCategories(): Promise<ApiResponse<Category[]>> {
+    return http.get('/admin/categories').then((r) => r.data)
+  },
+  createCategory(data: Partial<Category>): Promise<ApiResponse<Category>> {
+    return http.post('/admin/categories', data).then((r) => r.data)
+  },
+  updateCategory(id: number, data: Partial<Category>): Promise<ApiResponse<Category>> {
+    return http.put(`/admin/categories/${id}`, data).then((r) => r.data)
+  },
+  deleteCategory(id: number): Promise<ApiResponse<null>> {
+    return http.delete(`/admin/categories/${id}`).then((r) => r.data)
+  },
+
+
+  // Tags
+  getTags(): Promise<ApiResponse<Tag[]>> {
+    return http.get('/admin/tags').then((r) => r.data)
+  },
+  createTag(data: Partial<Tag>): Promise<ApiResponse<Tag>> {
+    return http.post('/admin/tags', data).then((r) => r.data)
+  },
+  updateTag(id: number, data: Partial<Tag>): Promise<ApiResponse<Tag>> {
+    return http.put(`/admin/tags/${id}`, data).then((r) => r.data)
+  },
+  deleteTag(id: number): Promise<ApiResponse<null>> {
+    return http.delete(`/admin/tags/${id}`).then((r) => r.data)
   },
 }

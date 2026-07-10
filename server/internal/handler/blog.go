@@ -85,18 +85,45 @@ func (h *BlogHandler) Detail(c *gin.Context) {
 
 func (h *BlogHandler) Create(c *gin.Context) {
 	user := middleware.GetCurrentUser(c)
-	var blog model.Blog
-	if err := c.ShouldBindJSON(&blog); err != nil {
+	var input struct {
+		Title      string `json:"title"`
+		Content    string `json:"content"`
+		Summary    string `json:"summary"`
+		Status     string `json:"status"`
+		CategoryID uint   `json:"categoryID"`
+		Tags       []model.Tag `json:"tags"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil {
 		Error(c, 400, "请求参数错误")
 		return
 	}
-	blog.AuthorID = user.ID
-	blog.Slug = generateSlug(blog.Title)
+
+	blog := model.Blog{
+		Title: input.Title, Content: input.Content, Summary: input.Summary,
+		Status: input.Status, CategoryID: input.CategoryID,
+		AuthorID: user.ID,
+		Slug: generateSlug(input.Title),
+	}
+
+	if input.Status == "published" {
+		now := time.Now()
+		blog.PublishedAt = &now
+	}
 
 	if err := database.DB.Create(&blog).Error; err != nil {
 		Error(c, 500, "创建失败")
 		return
 	}
+
+	if len(input.Tags) > 0 {
+		var tags []model.Tag
+		for _, t := range input.Tags {
+			tags = append(tags, model.Tag{ID: t.ID})
+		}
+		database.DB.Model(&blog).Association("Tags").Replace(tags)
+	}
+
+	database.DB.Preload("Author").Preload("Category").Preload("Tags").First(&blog, blog.ID)
 	Success(c, blog)
 }
 

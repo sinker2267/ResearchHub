@@ -3,7 +3,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { adminApi } from '@/api'
 import { formatDate } from '@/utils'
-import type { UserListItem } from '@/types'
+import type { UserListItem, Role } from '@/types'
 
 const users = ref<UserListItem[]>([])
 const loading = ref(true)
@@ -20,6 +20,7 @@ const form = reactive({
   title: '',
 })
 
+const allRoles = ref<Role[]>([])
 const rules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
@@ -29,6 +30,7 @@ async function loadUsers(): Promise<void> {
   loading.value = true
   try {
     const res = await adminApi.getUsers({ page: 1, pageSize: 100 })
+    const roleRes = await adminApi.getRoles(); allRoles.value = roleRes.data
     users.value = res.data.data
   } finally {
     loading.value = false
@@ -39,6 +41,7 @@ function openCreate(): void {
   isEdit.value = false
   editId.value = null
   form.username = ''; form.password = ''; form.displayName = ''
+  form.roleIds = [] as number[]
   form.email = ''; form.department = ''; form.title = ''
   dialogVisible.value = true
 }
@@ -49,6 +52,7 @@ function openEdit(user: UserListItem): void {
   form.username = user.username; form.password = ''
   form.displayName = user.displayName; form.email = user.email
   form.department = user.department; form.title = user.title || ''
+  form.roleIds = user.roles?.map((r) => r.id) || []
   dialogVisible.value = true
 }
 
@@ -62,6 +66,7 @@ async function handleSave(): Promise<void> {
       email: form.email, department: form.department, title: form.title,
     }
     if (form.password) payload.password = form.password
+    payload.roleIds = form.roleIds
 
     if (isEdit.value && editId.value) {
       await adminApi.updateUser(editId.value, payload as any)
@@ -138,6 +143,11 @@ onMounted(() => { loadUsers() })
         </el-form-item>
         <el-form-item label="邮箱">
           <el-input v-model="form.email" placeholder="邮箱地址" />
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-checkbox-group v-model="form.roleIds">
+            <el-checkbox v-for="r in allRoles" :key="r.id" :value="r.id">{{ r.name }}</el-checkbox>
+          </el-checkbox-group>
         </el-form-item>
         <el-form-item label="部门">
           <el-input v-model="form.department" placeholder="所属部门" />

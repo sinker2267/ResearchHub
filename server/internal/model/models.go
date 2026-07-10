@@ -68,7 +68,7 @@ type Blog struct {
 	IsPinned     bool       `gorm:"default:false" json:"isPinned"`
 	PinnedAt     *time.Time `json:"pinnedAt"`
 	Author       User      `gorm:"foreignKey:AuthorID" json:"author"`
-	CategoryID   uint      `json:"-"`
+	CategoryID   uint      `json:"categoryID"`
 	Category     Category  `gorm:"foreignKey:CategoryID" json:"category"`
 	Tags         []Tag     `gorm:"many2many:blog_tags;" json:"tags"`
 	Likes        []User    `gorm:"many2many:blog_likes;" json:"-"`
@@ -107,7 +107,7 @@ type Resource struct {
 	IsPinned     bool       `gorm:"default:false" json:"isPinned"`
 	PinnedAt     *time.Time `json:"pinnedAt"`
 	Author        User              `gorm:"foreignKey:AuthorID" json:"author"`
-	CategoryID    uint              `json:"-"`
+	CategoryID    uint              `json:"categoryID"`
 	Category      Category          `gorm:"foreignKey:CategoryID" json:"category"`
 	Tags          []Tag             `gorm:"many2many:resource_tags;" json:"tags"`
 	Files         []ResourceFile    `gorm:"foreignKey:ResourceID" json:"files"`
