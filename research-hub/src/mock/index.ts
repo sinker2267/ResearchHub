@@ -1,13 +1,12 @@
 import type {
-  ApiResponse, PageResponse, Pagination, LoginRequest, LoginResponse,
+  ApiResponse, PageResponse, LoginRequest, LoginResponse,
   BlogPost, BlogListParams, BlogComment, Resource, ResourceListParams,
-  Notice, UserProfile, FavoriteItem, DownloadRecord,
+  Notice, UserProfile,
 } from '@/types'
 import {
   mockUsers, mockBlogs, mockResources, mockNotices,
   mockCategories, mockTags, mockComments,
 } from './data'
-import { STORAGE_KEYS } from '@/constants'
 
 // Simulate network delay
 function delay(ms = 300): Promise<void> {

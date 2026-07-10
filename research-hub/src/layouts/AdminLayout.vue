@@ -6,7 +6,6 @@ import { usePermissionStore } from '@/stores/permission'
 import { useSettingStore } from '@/stores/setting'
 
 const route = useRoute()
-const router = useRouter()
 const permissionStore = usePermissionStore()
 const settingStore = useSettingStore()
 

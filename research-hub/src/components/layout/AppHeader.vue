@@ -14,7 +14,6 @@ const noticeStore = useNoticeStore()
 const permissionStore = usePermissionStore()
 
 const searchQuery = ref('')
-const showCreateMenu = ref(false)
 
 const createActions = computed(() => {
   const actions: { label: string; icon: string; path: string; show: boolean }[] = [
