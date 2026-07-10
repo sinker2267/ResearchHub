@@ -61,7 +61,7 @@ async function handleSave(): Promise<void> {
   if (!isEdit.value && !form.password) { ElMessage.warning('请输入密码'); return }
 
   try {
-    const payload: Record<string, string> = {
+    const payload: Record<string, string | number[]> = {
       username: form.username, displayName: form.displayName,
       email: form.email, department: form.department, title: form.title,
     }
