@@ -13,7 +13,7 @@ const form = reactive({ name: '', slug: '', color: '#4c6ef5' })
 
 async function loadTags(): Promise<void> {
   loading.value = true
-  try { const res = await adminApi.getTags(); tags.value = res.data } finally { loading.value = false }
+  try { const res = await adminApi.getTags(); tags.value = res.data } catch { /* ignore */ } finally { loading.value = false }
 }
 
 function openCreate(): void { isEdit.value = false; editId.value = null; form.name = ''; form.slug = ''; form.color = '#4c6ef5'; dialogVisible.value = true }
@@ -29,7 +29,16 @@ async function handleSave(): Promise<void> {
 }
 
 async function handleDelete(id: number, name: string): Promise<void> {
-  try { await ElMessageBox.confirm(`确定删除标签 "${name}"？`, '确认删除', { type: 'warning' }); await adminApi.deleteTag(id); ElMessage.success('已删除'); await loadTags() } catch { /* cancelled */ }
+  try {
+    await ElMessageBox.confirm(`确定删除标签 "${name}"？`, '确认删除', { type: 'warning' })
+  } catch { return /* user cancelled */ }
+  try {
+    await adminApi.deleteTag(id)
+    tags.value = tags.value.filter((t) => t.id !== id)
+    ElMessage.success('已删除')
+  } catch {
+    ElMessage.error('删除失败，可能有文章或资源正在使用该标签')
+  }
 }
 
 onMounted(() => { loadTags() })

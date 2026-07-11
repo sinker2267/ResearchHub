@@ -11,7 +11,7 @@ const isEdit = ref(false)
 const editId = ref<number | null>(null)
 const form = reactive({ name: '', slug: '', description: '' })
 
-async function load(): Promise<void> { loading.value = true; try { const res = await resourceApi.getCategories(); categories.value = res.data } finally { loading.value = false } }
+async function load(): Promise<void> { loading.value = true; try { const res = await resourceApi.getCategories(); categories.value = res.data } catch { /* ignore */ } finally { loading.value = false } }
 function openCreate(): void { isEdit.value = false; editId.value = null; form.name = ''; form.slug = ''; form.description = ''; dialogVisible.value = true }
 function openEdit(cat: Category): void { isEdit.value = true; editId.value = cat.id; form.name = cat.name; form.slug = cat.slug; form.description = cat.description; dialogVisible.value = true }
 
@@ -25,7 +25,12 @@ async function handleSave(): Promise<void> {
 }
 
 async function handleDelete(id: number, name: string): Promise<void> {
-  try { await ElMessageBox.confirm(`确定删除分类 "${name}"？`, '确认删除', { type: 'warning' }); await adminApi.deleteCategory(id); ElMessage.success('已删除'); await load() } catch { /* cancelled */ }
+  try { await ElMessageBox.confirm(`确定删除分类 "${name}"？`, '确认删除', { type: 'warning' }) } catch { return }
+  try {
+    await adminApi.deleteCategory(id)
+    categories.value = categories.value.filter((c) => c.id !== id)
+    ElMessage.success('已删除')
+  } catch { ElMessage.error('删除失败，可能有文章或资源正在使用该分类') }
 }
 
 onMounted(() => { load() })
