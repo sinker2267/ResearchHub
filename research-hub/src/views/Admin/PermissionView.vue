@@ -1,39 +1,34 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { PERMISSIONS } from '@/constants'
+import { ref, onMounted } from 'vue'
+import { adminApi } from '@/api'
+import type { Permission } from '@/types'
 
-interface PermGroup { resource: string; label: string; items: { code: string; label: string }[] }
+const permissions = ref<Permission[]>([])
+const loading = ref(true)
 
-const groups = ref<PermGroup[]>([
-  { resource: 'blog', label: '博客', items: [
-    { code: PERMISSIONS.BLOG_VIEW, label: '查看博客' },
-    { code: PERMISSIONS.BLOG_CREATE, label: '创建博客' },
-    { code: PERMISSIONS.BLOG_EDIT, label: '编辑博客' },
-    { code: PERMISSIONS.BLOG_DELETE, label: '删除博客' },
-    { code: PERMISSIONS.BLOG_PUBLISH, label: '发布博客' },
-  ]},
-  { resource: 'resource', label: '资源', items: [
-    { code: PERMISSIONS.RESOURCE_VIEW, label: '查看资源' },
-    { code: PERMISSIONS.RESOURCE_CREATE, label: '创建资源' },
-    { code: PERMISSIONS.RESOURCE_EDIT, label: '编辑资源' },
-    { code: PERMISSIONS.RESOURCE_DELETE, label: '删除资源' },
-    { code: PERMISSIONS.RESOURCE_DOWNLOAD, label: '下载资源' },
-  ]},
-  { resource: 'notice', label: '通知', items: [
-    { code: PERMISSIONS.NOTICE_VIEW, label: '查看通知' },
-    { code: PERMISSIONS.NOTICE_CREATE, label: '创建通知' },
-    { code: PERMISSIONS.NOTICE_MANAGE, label: '管理通知' },
-  ]},
-  { resource: 'admin', label: '后台管理', items: [
-    { code: PERMISSIONS.ADMIN_ACCESS, label: '访问后台' },
-    { code: PERMISSIONS.USER_MANAGE, label: '用户管理' },
-    { code: PERMISSIONS.ROLE_MANAGE, label: '角色管理' },
-    { code: PERMISSIONS.PERMISSION_MANAGE, label: '权限管理' },
-    { code: PERMISSIONS.RESOURCE_MANAGE, label: '资源管理' },
-    { code: PERMISSIONS.LOG_VIEW, label: '查看日志' },
-    { code: PERMISSIONS.SETTING_MANAGE, label: '系统设置' },
-  ]},
-])
+async function load(): Promise<void> {
+  loading.value = true
+  try {
+    const res = await adminApi.getPermissions()
+    permissions.value = res.data
+  } finally { loading.value = false }
+}
+
+// Group by resource
+function groupedPerms(): Record<string, Permission[]> {
+  const groups: Record<string, Permission[]> = {}
+  for (const p of permissions.value) {
+    if (!groups[p.resource]) groups[p.resource] = []
+    groups[p.resource].push(p)
+  }
+  return groups
+}
+
+const groupLabels: Record<string, string> = {
+  blog: '博客', resource: '资源', notice: '通知', admin: '后台管理',
+}
+
+onMounted(() => { load() })
 </script>
 
 <template>
@@ -41,13 +36,13 @@ const groups = ref<PermGroup[]>([
     <h2 class="admin-page-title">权限管理</h2>
     <p class="admin-desc">所有系统权限列表，按资源模块分组展示。</p>
 
-    <div class="perm-grid">
-      <div v-for="group in groups" :key="group.resource" class="perm-group card">
+    <div class="perm-grid" v-loading="loading">
+      <div v-for="(perms, resource) in groupedPerms()" :key="resource" class="perm-group card">
         <div class="card-body">
-          <h3 class="group-name">{{ group.label }}</h3>
+          <h3 class="group-name">{{ groupLabels[resource] || resource }}</h3>
           <div class="perm-list">
-            <div v-for="perm in group.items" :key="perm.code" class="perm-row">
-              <span class="perm-label">{{ perm.label }}</span>
+            <div v-for="perm in perms" :key="perm.id" class="perm-row">
+              <span class="perm-label">{{ perm.name }}</span>
               <code class="perm-code">{{ perm.code }}</code>
             </div>
           </div>
