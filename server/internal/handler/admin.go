@@ -78,7 +78,7 @@ func (h *AdminHandler) UpdateUser(c *gin.Context) {
 	if err := database.DB.First(&user, id).Error; err != nil { Error(c, 404, "用户不存在"); return }
 
 	var input map[string]interface{}
-	
+	c.ShouldBindJSON(&input)
 
 	if roleIDs, ok := input["roleIds"]; ok {
 		var ids []float64
@@ -88,8 +88,8 @@ func (h *AdminHandler) UpdateUser(c *gin.Context) {
 		var roles []model.Role
 		database.DB.Find(&roles, ids)
 		database.DB.Model(&user).Association("Roles").Replace(roles)
+		delete(input, "roleIds")
 	}
-	c.ShouldBindJSON(&input)
 
 	if pw, ok := input["password"]; ok && pw != "" {
 		hash, _ := bcrypt.GenerateFromPassword([]byte(pw.(string)), bcrypt.DefaultCost)
