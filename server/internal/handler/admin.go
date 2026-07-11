@@ -78,6 +78,17 @@ func (h *AdminHandler) UpdateUser(c *gin.Context) {
 	if err := database.DB.First(&user, id).Error; err != nil { Error(c, 404, "用户不存在"); return }
 
 	var input map[string]interface{}
+	
+
+	if roleIDs, ok := input["roleIds"]; ok {
+		var ids []float64
+		for _, v := range roleIDs.([]interface{}) {
+			ids = append(ids, v.(float64))
+		}
+		var roles []model.Role
+		database.DB.Find(&roles, ids)
+		database.DB.Model(&user).Association("Roles").Replace(roles)
+	}
 	c.ShouldBindJSON(&input)
 
 	if pw, ok := input["password"]; ok && pw != "" {
@@ -92,7 +103,10 @@ func (h *AdminHandler) UpdateUser(c *gin.Context) {
 
 func (h *AdminHandler) DeleteUser(c *gin.Context) {
 	id, _ := ParseID(c, "id")
-	database.DB.Delete(&model.User{}, id)
+	var user model.User
+	if err := database.DB.First(&user, id).Error; err != nil { Error(c, 404, "用户不存在"); return }
+	database.DB.Model(&user).Association("Roles").Clear()
+	database.DB.Delete(&user)
 	Success(c, nil)
 }
 
