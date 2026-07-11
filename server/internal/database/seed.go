@@ -128,6 +128,7 @@ func Seed(db *gorm.DB) {
 		{Key: "site_title", Value: "ResearchHub", Group: "基础设置", Description: "站点标题"},
 		{Key: "site_description", Value: "科研知识管理平台", Group: "基础设置", Description: "站点描述"},
 		{Key: "max_upload_size", Value: "500", Group: "上传设置", Description: "单个文件最大上传体积（MB）"},
+		{Key: "upload_dir", Value: "/app/uploads", Group: "上传设置", Description: "资源文件存储目录"},
 		{Key: "allow_registration", Value: "true", Group: "安全设置", Description: "是否开放注册"},
 	}
 	db.Create(&settings)

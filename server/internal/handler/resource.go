@@ -4,6 +4,7 @@ import (
 	"math"
 	"fmt"
 	"strconv"
+	"os"
 	"researchhub-server/internal/database"
 	"researchhub-server/internal/middleware"
 	"researchhub-server/internal/model"
@@ -176,6 +177,13 @@ func (h *ResourceHandler) UploadFile(c *gin.Context) {
 
 	// Save file
 	savePath := "uploads/" + file.Filename
+
+	var dirSetting model.SystemSetting
+	if err := database.DB.Where("key = ?", "upload_dir").First(&dirSetting).Error; err == nil && dirSetting.Value != "" {
+		saveDir := dirSetting.Value
+		os.MkdirAll(saveDir, 0755)
+		savePath = saveDir + "/" + file.Filename
+	}
 	if err := c.SaveUploadedFile(file, savePath); err != nil {
 		Error(c, 500, "文件保存失败")
 		return
