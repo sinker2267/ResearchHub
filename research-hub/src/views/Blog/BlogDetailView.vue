@@ -39,7 +39,7 @@ async function handleAddComment(): Promise<void> {
   if (!commentText.value.trim() || !blogStore.currentPost) return
   submitting.value = true
   try {
-    const res = await mockAddComment(blogStore.currentPost.id, { content: commentText.value })
+    const res = await blogApi.addComment(blogStore.currentPost.id, { content: commentText.value })
     blogStore.comments.unshift(res.data)
     if (blogStore.currentPost) blogStore.currentPost.commentCount++
     commentText.value = ''
