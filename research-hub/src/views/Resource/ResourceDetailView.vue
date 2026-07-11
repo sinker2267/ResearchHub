@@ -23,6 +23,11 @@ async function load(): Promise<void> {
 }
 
 function handlePin(): void { if (resourceStore.currentResource) { resourceStore.currentResource.isPinned = !resourceStore.currentResource.isPinned; resourceStore.currentResource.pinnedAt = resourceStore.currentResource.isPinned ? new Date().toISOString() : null; } }
+function handleDownload(fileId: number): void {
+  if (resourceStore.currentResource) {
+    window.open(`/api/resources/${resourceStore.currentResource.id}/files/${fileId}/download`)
+  }
+}
 onMounted(() => { load() })
 </script>
 
@@ -80,7 +85,7 @@ onMounted(() => { load() })
                     <span class="col-dl">
                       <button
                         v-if="userStore.hasPermission(PERMISSIONS.RESOURCE_DOWNLOAD)"
-                        @click.stop
+                        @click.stop="handleDownload(file.id)"
                       >
                         <el-icon :size="14"><Download /></el-icon>
                       </button>
