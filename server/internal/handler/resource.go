@@ -102,7 +102,17 @@ func (h *ResourceHandler) Update(c *gin.Context) {
 
 func (h *ResourceHandler) Delete(c *gin.Context) {
 	id, _ := ParseID(c, "id")
-	database.DB.Delete(&model.Resource{}, id)
+	var r model.Resource
+	if err := database.DB.First(&r, id).Error; err != nil { Error(c, 404, "资源不存在"); return }
+	database.DB.Model(&r).Association("Tags").Clear()
+	database.DB.Model(&r).Association("Files").Delete()
+	database.DB.Model(&r).Association("Versions").Delete()
+	var resource model.Resource
+	if err := database.DB.First(&resource, id).Error; err != nil { Error(c, 404, "资源不存在"); return }
+	database.DB.Where("resource_id = ?", id).Delete(&model.ResourceFile{})
+	database.DB.Where("resource_id = ?", id).Delete(&model.ResourceVersion{})
+	database.DB.Model(&resource).Association("Tags").Clear()
+	database.DB.Delete(&r)
 	Success(c, nil)
 }
 
