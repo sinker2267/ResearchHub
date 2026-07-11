@@ -214,11 +214,11 @@ func (h *AdminHandler) UpdateTag(c *gin.Context) {
 
 func (h *AdminHandler) DeleteTag(c *gin.Context) {
 	id, _ := ParseID(c, "id")
+	database.DB.Exec("DELETE FROM blog_tags WHERE tag_id = ?", id)
+	database.DB.Exec("DELETE FROM resource_tags WHERE tag_id = ?", id)
 	database.DB.Delete(&model.Tag{}, id)
 	var tag model.Tag
 	if err := database.DB.First(&tag, id).Error; err != nil { Error(c, 404, "标签不存在"); return }
-	database.DB.Model(&tag).Association("Blogs").Clear()
-	database.DB.Model(&tag).Association("Resources").Clear()
 	Success(c, nil)
 }
 
@@ -250,10 +250,10 @@ func (h *AdminHandler) UpdateCategory(c *gin.Context) {
 
 func (h *AdminHandler) DeleteCategory(c *gin.Context) {
 	id, _ := ParseID(c, "id")
+	database.DB.Exec("UPDATE blogs SET category_id = NULL WHERE category_id = ?", id)
+	database.DB.Exec("UPDATE resources SET category_id = NULL WHERE category_id = ?", id)
 	database.DB.Delete(&model.Category{}, id)
 	var cat model.Category
 	if err := database.DB.First(&cat, id).Error; err != nil { Error(c, 404, "分类不存在"); return }
-	database.DB.Model(&cat).Association("Blogs").Clear()
-	database.DB.Model(&cat).Association("Resources").Clear()
 	Success(c, nil)
 }

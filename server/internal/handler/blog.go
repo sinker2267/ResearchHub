@@ -170,7 +170,11 @@ func (h *BlogHandler) Delete(c *gin.Context) {
 		}
 		if !isAdmin { Error(c, 403, "无权限删除"); return }
 	}
-	database.DB.Delete(&blog)
+	database.DB.Where("blog_id = ?", blog.ID).Delete(&model.BlogComment{})
+	database.DB.Model(&blog).Association("Tags").Clear()
+	database.DB.Model(&blog).Association("Likes").Clear()
+	database.DB.Model(&blog).Association("Favorites").Clear()
+	if err := database.DB.Delete(&blog).Error; err != nil { Error(c, 500, "删除失败"); return }
 	Success(c, nil)
 }
 
