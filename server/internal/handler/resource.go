@@ -2,6 +2,8 @@ package handler
 
 import (
 	"math"
+	"fmt"
+	"strconv"
 	"researchhub-server/internal/database"
 	"researchhub-server/internal/middleware"
 	"researchhub-server/internal/model"
@@ -158,6 +160,15 @@ func (h *ResourceHandler) UploadFile(c *gin.Context) {
 	}
 
 	file, err := c.FormFile("file")
+
+	var setting model.SystemSetting
+	if err := database.DB.Where("key = ?", "max_upload_size").First(&setting).Error; err == nil {
+		maxSize, _ := strconv.Atoi(setting.Value)
+		if maxSize > 0 && file.Size > int64(maxSize)*1024*1024 {
+			Error(c, 400, fmt.Sprintf("文件大小超过限制（%dMB）", maxSize))
+			return
+		}
+	}
 	if err != nil {
 		Error(c, 400, "请选择文件")
 		return
