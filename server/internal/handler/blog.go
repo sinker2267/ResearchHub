@@ -6,6 +6,7 @@ import (
 	"researchhub-server/internal/middleware"
 	"researchhub-server/internal/model"
 	"time"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -289,4 +290,12 @@ func (h *BlogHandler) TogglePin(c *gin.Context) {
 		database.DB.Model(&blog).Updates(map[string]interface{}{"is_pinned": true, "pinned_at": now})
 		Success(c, gin.H{"isPinned": true, "pinnedAt": now})
 	}
+}
+
+func generateSlugSafe(title string) string {
+	slug := generateSlug(title)
+	if slug == "" || len(slug) < 2 {
+		slug = fmt.Sprintf("res-%d", time.Now().UnixNano()/1e6)
+	}
+	return slug
 }

@@ -75,7 +75,7 @@ func (h *ResourceHandler) Create(c *gin.Context) {
 	var resource model.Resource
 	if err := c.ShouldBindJSON(&resource); err != nil { Error(c, 400, "请求参数错误"); return }
 	resource.AuthorID = middleware.GetCurrentUser(c).ID
-	resource.Slug = generateSlug(resource.Title)
+	resource.Slug = generateSlugSafe(resource.Title)
 	if err := database.DB.Create(&resource).Error; err != nil { Error(c, 500, "创建失败"); return }
 	Success(c, resource)
 }
