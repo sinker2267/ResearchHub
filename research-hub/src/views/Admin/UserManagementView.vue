@@ -83,7 +83,7 @@ async function handleSave(): Promise<void> {
 }
 
 async function handleDelete(id: number, name: string): Promise<void> {
-  try { await ElMessageBox.confirm(`确定删除用户 "${name}"？`, 确认删除, { type: warning }) } catch { return }; try {
+  try { await ElMessageBox.confirm(`确定删除用户 "${name}"？`, '确认删除', { type: 'warning' }) } catch { return }; try {
     await ElMessageBox.confirm(`确定要删除用户 "${name}" 吗？此操作不可撤销。`, '确认删除', { type: 'warning' })
     await adminApi.deleteUser(id)
     ElMessage.success('已删除')

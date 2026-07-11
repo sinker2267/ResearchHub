@@ -59,7 +59,7 @@ async function handleSave(): Promise<void> {
 }
 
 async function handleDelete(id: number, name: string): Promise<void> {
-  try { await ElMessageBox.confirm(`确定删除角色 "${name}"？`, 确认删除, { type: warning }) } catch { return }; try {
+  try { await ElMessageBox.confirm(`确定删除角色 "${name}"？`, '确认删除', { type: 'warning' }) } catch { return }; try {
     await ElMessageBox.confirm(`确定删除角色 "${name}"？`, '确认删除', { type: 'warning' })
     await adminApi.deleteRole(id)
     ElMessage.success('已删除')
