@@ -52,7 +52,7 @@ func Seed(db *gorm.DB) {
 	var userPerms []model.Permission
 	for _, p := range perms {
 		if p.Code == "blog:view" || p.Code == "resource:view" || p.Code == "resource:download" || p.Code == "notice:view" {
-			userPerms = append(userPerms, p)
+			
 		}
 	}
 	db.Model(&userRole).Association("Permissions").Append(userPerms)

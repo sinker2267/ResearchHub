@@ -160,7 +160,17 @@ func (h *BlogHandler) Update(c *gin.Context) {
 
 func (h *BlogHandler) Delete(c *gin.Context) {
 	id, _ := ParseID(c, "id")
-	database.DB.Delete(&model.Blog{}, id)
+	var blog model.Blog
+	if err := database.DB.First(&blog, id).Error; err != nil { Error(c, 404, "文章不存在"); return }
+	user := middleware.GetCurrentUser(c)
+	if blog.AuthorID != user.ID {
+		isAdmin := false
+		for _, r := range user.Roles {
+			if r.Code == "admin" { isAdmin = true; break }
+		}
+		if !isAdmin { Error(c, 403, "无权限删除"); return }
+	}
+	database.DB.Delete(&blog)
 	Success(c, nil)
 }
 
