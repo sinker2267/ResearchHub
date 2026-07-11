@@ -68,7 +68,6 @@ export interface BlogPost {
   viewCount: number
   likeCount: number
   commentCount: number; visibility?: string
-  visibility: string
   isPinned?: boolean
   pinnedAt?: string | null
   isLiked: boolean
