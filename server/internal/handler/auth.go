@@ -139,3 +139,69 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 	}
 	Success(c, nil)
 }
+
+func (h *AuthHandler) RegisterStatus(c *gin.Context) {
+	var setting model.SystemSetting
+	result := database.DB.Where("key = ?", "allow_registration").First(&setting)
+	allowed := result.Error == nil && setting.Value == "true"
+	Success(c, gin.H{"allowed": allowed})
+}
+
+func (h *AuthHandler) Register(c *gin.Context) {
+	var setting model.SystemSetting
+	if err := database.DB.Where("key = ?", "allow_registration").First(&setting).Error; err != nil || setting.Value != "true" {
+		Error(c, 403, "暂不开放注册")
+		return
+	}
+
+	var input struct {
+		Username    string `json:"username" binding:"required"`
+		Password    string `json:"password" binding:"required"`
+		DisplayName string `json:"displayName"`
+		Email       string `json:"email"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil { Error(c, 400, "请填写用户名和密码"); return }
+
+	var existing model.User
+	if database.DB.Where("username = ?", input.Username).First(&existing).Error == nil {
+		Error(c, 400, "用户名已存在")
+		return
+	}
+
+	hash, _ := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+	user := model.User{
+		Username: input.Username, Password: string(hash),
+		DisplayName: input.DisplayName, Email: input.Email,
+	}
+	database.DB.Create(&user)
+
+	// Assign default user role
+	var userRole model.Role
+	if database.DB.Where("code = ?", "user").First(&userRole).Error == nil {
+		database.DB.Model(&user).Association("Roles").Append(&userRole)
+	}
+
+	// Generate token (auto login)
+	accessToken, _ := middleware.GenerateToken(user.ID, user.Username, h.Config)
+	refreshToken := uuid.NewString()
+	database.DB.Create(&model.RefreshToken{Token: refreshToken, UserID: user.ID, ExpiresAt: time.Now().Add(7 * 24 * time.Hour)})
+
+	database.DB.Preload("Roles.Permissions").First(&user, user.ID)
+	var permissions []string
+	for _, role := range user.Roles {
+		for _, perm := range role.Permissions {
+			permissions = append(permissions, perm.Code)
+		}
+	}
+	if permissions == nil { permissions = []string{} }
+
+	Success(c, gin.H{
+		"accessToken": accessToken, "refreshToken": refreshToken, "expiresIn": 86400,
+		"userInfo": gin.H{
+			"id": user.ID, "username": user.Username, "displayName": user.DisplayName,
+			"email": user.Email, "avatar": user.Avatar, "bio": user.Bio,
+			"department": user.Department, "title": user.Title,
+			"roles": user.Roles, "permissions": permissions,
+		},
+	})
+}

@@ -27,6 +27,8 @@ func Setup(cfg *config.Config) *gin.Engine {
 	auth := api.Group("/auth")
 	{
 		auth.POST("/login", authH.Login)
+	auth.GET("/register-status", authH.RegisterStatus)
+	auth.POST("/register", authH.Register)
 		auth.POST("/refresh", authH.Refresh)
 	}
 
