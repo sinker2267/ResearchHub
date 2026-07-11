@@ -20,6 +20,10 @@ func (h *ResourceHandler) List(c *gin.Context) {
 	var total int64
 
 	query := database.DB.Model(&model.Resource{}).Where("status = ?", "published")
+	user := middleware.GetCurrentUser(c)
+	isAdmin := false
+	for _, r := range user.Roles { if r.Code == "admin" { isAdmin = true; break } }
+	if !isAdmin { query = query.Where("visibility = ?", "public") }
 
 	if typ := c.Query("type"); typ != "" {
 		query = query.Where("type = ?", typ)

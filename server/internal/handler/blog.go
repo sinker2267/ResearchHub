@@ -21,6 +21,10 @@ func (h *BlogHandler) List(c *gin.Context) {
 	var total int64
 
 	query := database.DB.Model(&model.Blog{}).Where("status = ?", "published")
+	user := middleware.GetCurrentUser(c)
+	isAdmin := false
+	for _, r := range user.Roles { if r.Code == "admin" { isAdmin = true; break } }
+	if !isAdmin { query = query.Where("visibility = ?", "public") }
 
 	if cat := c.Query("category"); cat != "" {
 		query = query.Joins("JOIN categories ON categories.id = blogs.category_id").

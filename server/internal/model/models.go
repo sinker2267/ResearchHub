@@ -58,6 +58,7 @@ type Blog struct {
 	Content      string    `gorm:"type:text" json:"content"`
 	CoverImage   string    `gorm:"size:500" json:"coverImage"`
 	Status       string    `gorm:"size:20;default:draft" json:"status"`
+	Visibility   string    `gorm:"size:20;default:public" json:"visibility"`
 	ViewCount    int       `gorm:"default:0" json:"viewCount"`
 	LikeCount    int       `gorm:"default:0" json:"likeCount"`
 	CommentCount int       `gorm:"default:0" json:"commentCount"`
@@ -98,6 +99,7 @@ type Resource struct {
 	License       string            `gorm:"size:200" json:"license"`
 	Citation      string            `gorm:"type:text" json:"citation"`
 	Status        string            `gorm:"size:20;default:draft" json:"status"`
+	Visibility    string            `gorm:"size:20;default:public" json:"visibility"`
 	ViewCount     int               `gorm:"default:0" json:"viewCount"`
 	DownloadCount int               `gorm:"default:0" json:"downloadCount"`
 	LikeCount     int               `gorm:"default:0" json:"likeCount"`

@@ -16,6 +16,7 @@ const editId = ref<number | null>(null)
 const title = ref('')
 const content = ref('')
 const selectedCategoryId = ref<number | null>(null)
+const selectedVisibility = ref("public")
 const selectedTagIds = ref<number[]>([])
 
 const categories = ref<Category[]>([])
@@ -80,6 +81,7 @@ async function handleSave(status: 'draft' | 'published'): Promise<void> {
     const payload: Partial<BlogPost> = {
       title: title.value, content: content.value, summary: content.value.slice(0, 200),
       status, categoryID: selectedCategoryId.value || 0,
+      visibility: selectedVisibility.value,
       tags: allTags.value.filter((t) => selectedTagIds.value.includes(t.id)),
     }
     if (isEditing.value && editId.value) { await blogApi.update(editId.value, payload); ElMessage.success('更新成功') }
@@ -113,6 +115,10 @@ onMounted(async () => {
         </div>
         <div class="header-right">
           <el-select v-model="selectedCategoryId" placeholder="选择分类" size="small" class="cat-select" clearable :loading="loadingMeta">
+          <el-select v-model="selectedVisibility" size="small" class="vis-select" placeholder="可见性">
+            <el-option label="公开" value="public" />
+            <el-option label="仅管理员" value="admin" />
+          </el-select>
             <el-option v-for="cat in categories" :key="cat.id" :label="cat.name" :value="cat.id" />
           </el-select>
         </div>

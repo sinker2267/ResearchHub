@@ -3,14 +3,14 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBlogStore } from '@/stores/blog'
 import { useUserStore } from '@/stores/user'
-import { mockCategories, mockTags } from '@/mock/data'
+import { resourceApi } from '@/api'
 import { PERMISSIONS, PAGINATION_DEFAULTS } from '@/constants'
 import BlogCard from '@/components/blog/BlogCard.vue'
 import PageLoading from '@/components/common/PageLoading.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import ErrorState from '@/components/common/ErrorState.vue'
 import { Edit } from '@element-plus/icons-vue'
-import type { BlogListParams } from '@/types'
+import type { BlogListParams, Category, Tag } from '@/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -26,8 +26,8 @@ const selectedSort = ref<'latest' | 'popular'>('latest')
 const currentPage = ref(1)
 const pageSize = PAGINATION_DEFAULTS.PAGE_SIZE
 
-const categories = mockCategories
-const tags = mockTags
+const categories = ref<Category[]>([])
+const tags = ref<Tag[]>([])
 
 const queryParams = computed<BlogListParams>(() => ({
   page: currentPage.value,
@@ -53,12 +53,12 @@ async function loadPosts(): Promise<void> {
 
 function handleSearch(): void {
   currentPage.value = 1
-  loadPosts()
+  
 }
 
 function handlePageChange(page: number): void {
   currentPage.value = page
-  loadPosts()
+  
 }
 
 function handleCreate(): void {
@@ -67,14 +67,16 @@ function handleCreate(): void {
 
 watch([selectedCategory, selectedTag, selectedSort], () => {
   currentPage.value = 1
-  loadPosts()
+  
 })
 
+async function loadMeta() { const [c, t] = await Promise.all([resourceApi.getCategories(), resourceApi.getTags()]); categories.value = c.data; tags.value = t.data }
+onMounted(async () => { await loadMeta(); loadPosts() })
 onMounted(() => {
   if (route.query.q) {
     keyword.value = route.query.q as string
   }
-  loadPosts()
+  
 })
 </script>
 

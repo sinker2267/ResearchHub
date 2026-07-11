@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useResourceStore } from '@/stores/resource'
-import { mockCategories, mockTags } from '@/mock/data'
+import { resourceApi } from '@/api'
 import { RESOURCE_TYPES, PAGINATION_DEFAULTS } from '@/constants'
 import { formatFileSize, formatRelativeTime } from '@/utils'
 import PageLoading from '@/components/common/PageLoading.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import ErrorState from '@/components/common/ErrorState.vue'
 import { Download, View } from '@element-plus/icons-vue'
-import type { ResourceType } from '@/types'
+import type { ResourceType, Category, Tag } from '@/types'
 
 const resourceStore = useResourceStore()
 const loading = ref(true)
@@ -22,8 +22,8 @@ const currentPage = ref(1)
 const pageSize = PAGINATION_DEFAULTS.PAGE_SIZE
 
 const types = RESOURCE_TYPES
-const categories = mockCategories
-const tags = mockTags
+const categories = ref<Category[]>([])
+const tags = ref<Tag[]>([])
 
 const queryParams = computed(() => ({
   page: currentPage.value, pageSize,
@@ -44,6 +44,8 @@ watch([selectedType, selectedCategory, selectedTag, selectedSort], () => {
   currentPage.value = 1; load()
 })
 
+async function loadMeta() { const [c, t] = await Promise.all([resourceApi.getCategories(), resourceApi.getTags()]); categories.value = c.data; tags.value = t.data }
+onMounted(async () => { await loadMeta(); load() })
 onMounted(() => { load() })
 </script>
 

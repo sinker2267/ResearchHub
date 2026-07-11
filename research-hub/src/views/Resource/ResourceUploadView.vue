@@ -14,6 +14,7 @@ const form = reactive({
   title: '', description: '', type: '' as ResourceType | '',
   categoryID: null as number | null, tagIds: [] as number[],
   license: 'CC BY 4.0', citation: '',
+  visibility: 'public',
 })
 
 const categories = ref<Category[]>([])
@@ -101,6 +102,12 @@ onMounted(() => { loadMeta() })
               <el-input v-model="form.title" placeholder="输入资源名称..." />
             </el-form-item>
             <el-form-item label="资源类型" required>
+            <el-form-item label="可见性">
+              <el-select v-model="form.visibility" style="width:200px">
+                <el-option label="公开" value="public" />
+                <el-option label="仅管理员" value="admin" />
+              </el-select>
+            </el-form-item>
               <el-select v-model="form.type" placeholder="选择类型" style="width:200px">
                 <el-option v-for="t in RESOURCE_TYPES" :key="t.value" :label="t.label" :value="t.value" />
               </el-select>
