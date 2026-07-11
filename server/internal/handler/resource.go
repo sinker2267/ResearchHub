@@ -131,3 +131,48 @@ func (h *ResourceHandler) TogglePin(c *gin.Context) {
 		Success(c, gin.H{"isPinned": true, "pinnedAt": now})
 	}
 }
+
+func (h *ResourceHandler) UploadFile(c *gin.Context) {
+	id, _ := ParseID(c, "id")
+	var resource model.Resource
+	if err := database.DB.First(&resource, id).Error; err != nil {
+		Error(c, 404, "资源不存在")
+		return
+	}
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		Error(c, 400, "请选择文件")
+		return
+	}
+
+	// Save file
+	savePath := "uploads/" + file.Filename
+	if err := c.SaveUploadedFile(file, savePath); err != nil {
+		Error(c, 500, "文件保存失败")
+		return
+	}
+
+	rf := model.ResourceFile{
+		ResourceID: resource.ID,
+		Filename:   file.Filename,
+		FilePath:   savePath,
+		Size:       file.Size,
+		MimeType:   file.Header.Get("Content-Type"),
+	}
+	database.DB.Create(&rf)
+	Success(c, rf)
+}
+
+func (h *ResourceHandler) DownloadFile(c *gin.Context) {
+	id, _ := ParseID(c, "id")
+	fileID, _ := ParseID(c, "fileId")
+
+	var rf model.ResourceFile
+	if err := database.DB.Where("id = ? AND resource_id = ?", fileID, id).First(&rf).Error; err != nil {
+		Error(c, 404, "文件不存在")
+		return
+	}
+
+	c.FileAttachment(rf.FilePath, rf.Filename)
+}

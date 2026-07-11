@@ -60,6 +60,8 @@ func Setup(cfg *config.Config) *gin.Engine {
 		protected.GET("/resources/categories", resourceH.Categories)
 		protected.GET("/resources/tags", resourceH.Tags)
 		protected.PUT("/resources/:id/pin", middleware.RequirePermission("resource:edit"), resourceH.TogglePin)
+		protected.POST("/resources/:id/files", middleware.RequirePermission("resource:create"), resourceH.UploadFile)
+		protected.GET("/resources/:id/files/:fileId/download", resourceH.DownloadFile)
 
 		// Notices
 		protected.GET("/notices", noticeH.List)

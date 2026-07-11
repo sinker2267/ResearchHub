@@ -17,9 +17,6 @@ export const resourceApi = {
   delete(id: number): Promise<ApiResponse<null>> {
     return http.delete(`/resources/${id}`).then((r) => r.data)
   },
-  getDownloadUrl(resourceId: number, fileId: number): Promise<ApiResponse<{ url: string }>> {
-    return http.get(`/resources/${resourceId}/files/${fileId}/download`).then((r) => r.data)
-  },
   like(id: number): Promise<ApiResponse<{ liked: boolean }>> {
     return http.post(`/resources/${id}/like`).then((r) => r.data)
   },
@@ -31,5 +28,10 @@ export const resourceApi = {
   },
   getTags(): Promise<ApiResponse<Tag[]>> {
     return http.get('/resources/tags').then((r) => r.data)
+  },
+  uploadFile(resourceId: number, formData: FormData): Promise<ApiResponse<any>> {
+    return http.post(`/resources/${resourceId}/files`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((r) => r.data)
   },
 }
