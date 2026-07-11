@@ -1,22 +1,21 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { userApi } from '@/api'
 import { formatFileSize, formatDate } from '@/utils'
 import PageLoading from '@/components/common/PageLoading.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import { Download } from '@element-plus/icons-vue'
+import type { DownloadRecord } from '@/types'
 
 const loading = ref(true)
-const records = ref<{ id: number; resourceTitle: string; resourceId: number; fileName: string; fileSize: number; downloadedAt: string }[]>([])
+const records = ref<DownloadRecord[]>([])
 
 async function load(): Promise<void> {
   loading.value = true
-  await new Promise((r) => setTimeout(r, 300))
-  records.value = [
-    { id: 1, resourceTitle: 'Human Protein Atlas v23 数据集', resourceId: 101, fileName: 'hpa_v23_normal_tissue.h5', fileSize: 2.4 * 1024 * 1024 * 1024, downloadedAt: '2026-07-09T10:30:00Z' },
-    { id: 2, resourceTitle: 'MolDock Pro — 分子对接分析工具包', resourceId: 102, fileName: 'moldock_pro_v2.1.0_linux.tar.gz', fileSize: 156 * 1024 * 1024, downloadedAt: '2026-07-07T16:20:00Z' },
-    { id: 3, resourceTitle: 'scRNA-seq Benchmark 数据集', resourceId: 103, fileName: 'pbmc_10x_v3_filtered.h5ad', fileSize: 1.2 * 1024 * 1024 * 1024, downloadedAt: '2026-07-02T09:00:00Z' },
-  ]
-  loading.value = false
+  try {
+    const res = await userApi.getDownloadHistory({ page: 1, pageSize: 100 })
+    records.value = res.data.data
+  } finally { loading.value = false }
 }
 
 onMounted(() => { load() })
@@ -35,7 +34,7 @@ onMounted(() => { load() })
               <div class="dl-icon"><el-icon :size="20"><Download /></el-icon></div>
               <div class="dl-info">
                 <h4 class="dl-resource">{{ rec.resourceTitle }}</h4>
-                <p class="dl-file">{{ rec.fileName }} · {{ formatFileSize(rec.fileSize) }}</p>
+                <p class="dl-file">{{ rec.fileName }}</p>
               </div>
               <span class="dl-time">{{ formatDate(rec.downloadedAt, 'date') }}</span>
             </div>
@@ -49,7 +48,6 @@ onMounted(() => { load() })
 <style lang="scss" scoped>
 .dl-page { min-height: calc(100vh - 56px); padding: 24px 0; }
 .page-title { font-size: 22px; font-weight: 600; color: #212529; margin-bottom: 24px; }
-
 .dl-list { display: flex; flex-direction: column; gap: 8px; }
 .dl-link { text-decoration: none; color: inherit; display: block; }
 .dl-body { padding: 16px 20px; display: flex; align-items: center; gap: 16px; }
